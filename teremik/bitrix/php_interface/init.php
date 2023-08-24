@@ -8,6 +8,13 @@ if( file_exists($roistatFilePath) ) {
 }
 // ROISTAT CODE END
 
+$albatoFilePath = __DIR__ . '/albato/Albato.php';
+if( file_exists($albatoFilePath) ) {
+    require_once $albatoFilePath;
+    Albato::init();
+}
+
+
 function pre($item, $show_for = false)
 {
     global $USER;
