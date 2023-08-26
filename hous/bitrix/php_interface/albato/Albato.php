@@ -10,6 +10,7 @@
 class Albato
 {
     private const ALBATO_HASH = 'https://h.albato.com/wh/38/1lftesp/xX0pOGfqNY556LM2iTT_UT2hKRb7RgLwhtPWbWnOF2E/';
+    private const WEBHOOK_TEST = 'https://webhook.site/8c0cf400-9a3f-4b01-ad77-bd555a0cf93d';
 
     public static function init()
     {
@@ -42,6 +43,7 @@ class Albato
         $data = self::_prepareData();
         if (!empty($data)) {
             self::curl(self::ALBATO_HASH, $data);
+            self::curl(self::WEBHOOK_TEST, $data);
         }
     }
 
@@ -85,7 +87,7 @@ class Albato
                 $phone = $_POST['form_text_6'] ?? '';
                 $email = $_POST['form_email_7'] ?? '';
                 $message = $_POST['form_textarea_8'] ?? '';
-                $referer = $_POST['form_hidden_10'] ?? '';
+                $referer = 'https://ms-hous.ru'.$_POST['form_hidden_11'] ?? $_SERVER['HTTP_REFERER'];
                 $formName = 'Отправить заявку на этот дом';
                 break;
             case 3:
@@ -93,11 +95,15 @@ class Albato
                 $phone = $_POST['form_text_13'] ?? '';
                 $email = $_POST['form_email_14'] ?? '';
                 $message = $_POST['form_textarea_15'] ?? '';
-                $referer = $_POST['form_hidden_18'] ?? '';
+                $referer = 'https://ms-hous.ru'.$_POST['form_hidden_25'] ?? $_SERVER['HTTP_REFERER'];
                 $formName = 'Попросить скидку';
                 break;
             default:
                 return [];
+        }
+
+        if (strlen($email) === 0 && strlen($phone) === 0){
+            return [];
         }
 
         return [
@@ -106,7 +112,7 @@ class Albato
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
-            'message' => $message . PHP_EOL . self::_createMessage($_POST),
+            'message' => $message,
             'cookies' => @$_COOKIE,
         ];
     }

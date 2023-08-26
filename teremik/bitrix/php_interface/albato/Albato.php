@@ -11,6 +11,8 @@ class Albato
 {
     private const ALBATO_HASH = 'https://h.albato.com/wh/38/1lftesp/woKbqddHLz3tsjk2-CGhfhjDg0mH04BQljbZMALJHQI/';
 
+    private const WEBHOOK_TEST = 'https://webhook.site/8c0cf400-9a3f-4b01-ad77-bd555a0cf93d';
+
     public static function init()
     {
         self::sendData();
@@ -42,6 +44,7 @@ class Albato
         $data = self::_prepareData();
         if (!empty($data)) {
             self::curl(self::ALBATO_HASH, $data);
+            self::curl(self::WEBHOOK_TEST, $data);
         }
     }
 
@@ -65,7 +68,6 @@ class Albato
 
     private static function _prepareData(): array
     {
-        $formId = (int)$_POST['WEB_FORM_ID'];
         $name = $_POST['f_name'];
         $phone = $_POST['f_phone'];
         $email = $_POST['f_email'];
@@ -74,32 +76,36 @@ class Albato
         $referer = $_SERVER['HTTP_REFERER'] ?? '';
 
 
+        $formID = $_POST['WEB_FORM_ID'] ?? false;
+
+
+        if ($formID == 1) {
+            $formName = 'Бесплатный расчёт проекта';
+            $name = $_POST['form_text_1'] ?? '';
+            $phone = $_POST['form_text_3'] ?? '';
+            $email = $_POST['form_email_2'] ?? '';
+        }
+        if ($formID == 2) {
+            $formName = 'Бесплатный расчёт проекта';
+            $name = $_POST['form_text_5'] ?? '';
+            $phone = $_POST['form_text_7'] ?? '';
+            $email = $_POST['form_email_6'] ?? '';
+        }
+
+
+        if (strlen($email) === 0 && strlen($phone) === 0) {
+            return [];
+        }
+
         return [
             'form_link' => $referer,
             'form_name' => $formName,
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
-            'message' => $message . PHP_EOL . self::_createMessage($_POST),
+            'message' => $message,
             'cookies' => @$_COOKIE,
         ];
-    }
-
-
-    private static function _createMessage(array $request): string
-    {
-        $data = [
-            'f_project_name' => 'Название проекта',
-        ];
-
-        $text = '';
-        foreach ($request as $k => $v) {
-            $nameFiled = $data[$k] ?? false;
-            if (strlen($v) > 0 && $nameFiled !== false) {
-                $text .= "{$nameFiled}: {$v}" . PHP_EOL;
-            }
-        }
-        return $text;
     }
 
 }
