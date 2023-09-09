@@ -68,7 +68,7 @@ class Albato
 
     private static function _prepareData(): array
     {
-        $formId = (int)$_POST['WEB_FORM_ID'];
+        $formId = (int) $_POST['WEB_FORM_ID'] ?? $_POST['sender_subscription'] ?? null;
         $name = '';
         $phone = '';
         $email = '';
@@ -98,11 +98,16 @@ class Albato
                 $referer = 'https://ms-hous.ru'.$_POST['form_hidden_25'] ?? $_SERVER['HTTP_REFERER'];
                 $formName = 'Попросить скидку';
                 break;
+            case 'add':
+                $email = $_POST['SENDER_SUBSCRIBE_EMAIL'];
+                $referer = $_SERVER['HTTP_REFERER'];
+                $formName = 'Подписка на рассылку';
+                break;
             default:
                 return [];
         }
 
-        if (strlen($email) === 0 && strlen($phone) === 0){
+        if (strlen($email) === 0 && strlen($phone) === 0) {
             return [];
         }
 
@@ -147,7 +152,7 @@ class Albato
         foreach ($request as $k => $v) {
             $nameFiled = $data[$k] ?? false;
             if (strlen($v) > 0 && $nameFiled !== false) {
-                $text .= "{$nameFiled}: {$v}" . PHP_EOL;
+                $text .= "{$nameFiled}: {$v}".PHP_EOL;
             }
         }
         return $text;
